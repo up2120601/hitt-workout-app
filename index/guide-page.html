@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Workout +</title>
+    <link href='http://fonts.googleapis.com/css?family=Ubuntu:bold' rel='stylesheet' type='text/css'>
+    <link href='http://fonts.googleapis.com/css?family=Vollkorn' rel='stylesheet' type='text/css'>
+</head>
+
+<body>
+    <div id="top-div">
+        <button type="button" id="back-button">Back to homepage</button>
+         <h1 id="title">A guide to Workout+</h1>
+            
+    </div>
+
+    <div id="main-div">
+
+        <div>
+            <button type="button" class="collapsable">How to make a workout</button>
+            <div class="content">
+                <img src="images/guide-data/guide-1.png">
+            </div>
+        </div>
+
+        <div>
+            <button type="button" class="collapsable">When making a workout</button>
+            <div class="content">
+                <img src="images/guide-data/guide-4.gif">
+            </div>
+        </div>
+
+        <div>
+            <button type="button" class="collapsable">How to edit a workout</button>
+            <div class="content">
+                <img src="images/guide-data/guide-2.png">
+            </div>
+        </div>
+
+        <div>
+            <button type="button" class="collapsable">How to try out an activity</button>
+            <div class="content">
+                <img src="images/guide-data/guide-3.png">
+            </div>
+        </div>
+    </div>
+
+</body>
+
+<style>
+    body {
+        background-image: url("images/guide-background.jpg");
+    }
+
+    h1, h2 {
+        font-family: "Ubuntu";
+    }
+
+    p {
+        font-family: "Vollkorn";
+    }
+
+    #back-button {
+        width: 10vw;
+        height: 5vw;
+        margin: 2vw;
+        border: 2px black solid;
+        border-radius: 20px;
+        background-color: white;
+    }
+
+    #top-div {
+        display: flex;
+    }
+
+    #title {
+        margin-top: 5vw;
+        margin-left: 25vw;
+        text-decoration: underline;
+        color: lightblue;
+        
+    }
+
+    #main-div {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        width: 99vw;
+        gap: 3vw;
+        margin-top: 8vw;
+    }
+
+    .collapsable {
+        width: 74vw;
+        height: 3.5vw;
+        font-size: 150%;
+        outline: none;
+        background-color: white;
+        border: 2px solid #42BDF2; 
+        border-radius: 18px;
+        
+    }
+
+    .active {
+        border-bottom-left-radius: 0px;
+        border-bottom-right-radius: 0px;
+    }
+
+    img {
+        margin-top: 1vw;
+        height: 20vw;
+        width: 70vw;
+    }
+    
+    .content {
+        display: none;
+        overflow: hidden;
+        background-color: lightblue; 
+        padding: 2vw;
+        margin-top: -2vw;
+        height: 20vw;
+        width: 70vw;
+        overflow: hidden;
+        border-bottom-left-radius: 18px;
+        border-bottom-right-radius: 18px;
+    }
+
+    .active, .collapsible:hover {
+        background-color: #ccc;
+    }
+
+</style>
+
+<script>
+    document.getElementById("back-button").addEventListener("click", function() {
+        window.location.href = "/mainpage"
+    })
+
+    var coll = document.getElementsByClassName("collapsable");
+
+    for (let i = 0; i < coll.length; i++) {
+        coll[i].addEventListener("click", function() {
+            this.classList.toggle("active");
+            var content = this.nextElementSibling;
+            if (content.style.display === "block") {
+                content.style.display = "none";
+            } else {
+                content.style.display = "block";
+            }
+        });
+    }
+
+    for (let i = 0; i < coll.length; i++) {
+        coll[i].addEventListener("click", function() {
+            this.classList.toggle("active");
+            var content = this.nextElementSibling;
+            if (content.style.maxHeight){
+                content.style.maxHeight = null;
+            } else {
+                content.style.maxHeight = content.scrollHeight + "px";
+            }
+        });
+    }
+
+
+</script>

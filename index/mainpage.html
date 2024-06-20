@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Workout +</title>
+</head>
+
+<body>
+    <div class="topnav">
+        <a draggable="false" class="active">Home</a>
+        <a draggable="false" href="recent-workouts">Recent activity</a>
+        <a draggable="false" href="create-workout">Create a<br/>workout</a>
+        <a draggable="false" href="activities">Activities</a>
+        <a draggable="false" id="lg-nav" href="/">Log out</a>
+    </div>
+
+    <div id="top-div">
+        
+        <div id="title-div">
+            <h1 id="title">Workout<span>+</span></h1>
+            <a id="guide-text" href="/guide">A guide to our platform</a>
+        </div>
+        
+        <div id="min-week-div">
+            <h2 id="min-text">Seconds exercised this week</h2>
+            <h2 id="min-amount"></h2>
+        </div>
+
+    </div>
+
+    <h1 id="workout-title">Your workouts</h1>
+
+    <div id="workout-div"></div>
+
+</body>
+
+<script>
+    fetch("/user-workouts")
+        .then(response => response.json())
+        .then(workouts => {
+            var container = document.getElementById("workout-div");
+
+            workouts.forEach(item => {
+
+                var newD = document.createElement("button");
+                newD.classList.add("wk-but");
+
+                var newUrl = "/workout-page?workout=" + item.id;
+                newD.onclick = () => window.location.href = newUrl;
+
+                var newT = item.name[0].toUpperCase() + item.name.slice(1);
+
+                newD.textContent = newT;
+                container.appendChild(newD);
+            })
+        })
+
+    fetch("/user-r-time")
+        .then(response => response.json())
+        .then(time => {
+            document.getElementById("min-amount").textContent = time.totalT;
+        })
+
+</script>
+
+<style>
+
+    body {
+        background-color: #fafafa;
+    }
+
+    #guide-text {
+        display: flex;
+        margin-left: 8vw;
+        font-size: 130%;
+        margin-top: -5vw;
+        mix-blend-mode:luminosity;
+        font-weight: 800;
+
+    }
+
+    #title {
+        margin-top: 5vw;
+        font-size: 400%;
+        margin-left: 5vw;
+        color: #42BDF2;
+        text-shadow: -2px 3px 11px rgba(255, 255, 255, 0.58);
+    }
+
+    .wk-but {
+        height: 20vw;
+        width: 15vw;
+        border: 2px solid #42BDF2;
+        border-radius: 10px;
+        background-color: white;
+        margin: 2vw;
+        font-size: 150%;
+    }
+
+    .wk-but:hover {
+        cursor: pointer;
+    }
+
+    #workout-div {
+        display: flex;
+        flex-direction: row;
+    }
+
+    #workout-title {
+        font-size: 200%;
+        text-decoration: underline;
+        text-align: center;
+        color: #42BDF2;
+    }
+
+    #min-text {
+        margin-bottom: -3vw;
+        color: #91aaff;
+        font-size: 180%;
+        font-weight: 600;
+        text-decoration: underline;
+    }
+
+    #min-amount {
+        color: #91aaff;
+        font-size: 400%;
+        font-weight: 700;
+        text-shadow: -2px 3px 11px rgba(255, 255, 255, 0.6);
+    }
+
+    #top-div {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        background-image: url("images/background-image.jpg");
+        background-repeat: no-repeat;
+        background-size: cover;
+        left: 0;
+        height: 35vw;
+        margin-top: 6vw;
+    }
+
+    #min-week-div {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        text-align: center;
+        margin-top: 10vw;
+        margin-right: 3vw;
+    }
+
+
+
+    #title span {
+        font-size: 250%;
+
+    }
+
+    #lg-nav:hover {
+        background-color: rgba(238,32,77, 0.3);
+        border: 1px solid black;
+    }
+
+    .topnav {
+        width: 100vw;
+        height: 1.5vw;
+        position: fixed;
+        top:0;
+        left: 0;
+    }
+
+    .topnav a {
+        float:left;
+        text-align: center;
+        text-decoration: none;
+        font-size: 110%;
+        font-weight: 600;
+        color: black;
+        padding-top: 2vw;
+        background-color: white;
+        width: 19.8vw;
+        height: 4vw;
+    }
+
+    .topnav a.active {
+        background-color: #72A0C1;
+        color: white;
+    }
+
+    .topnav a:hover {
+        background-color: #B9D9EB;
+    }
+</style>

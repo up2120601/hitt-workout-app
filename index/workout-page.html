@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Workout +</title>
+    <link href='http://fonts.googleapis.com/css?family=Ubuntu:bold' rel='stylesheet' type='text/css'>
+    <link href='http://fonts.googleapis.com/css?family=Vollkorn' rel='stylesheet' type='text/css'>
+</head>
+
+<body>
+    <div id="top">
+        <h1 id="workout-title" class="underline"></h1>
+        <button id="back-button" onclick="window.location.href='/mainpage'">&larr; Back</button>
+
+    </div>
+
+    <h1 id="countdown-text"></h1>
+
+
+    <div id="button-div1">
+        <button id="start-button">Start</button>
+    </div>
+
+    <div id="button-div2">
+        <button id="pause-button" class="buttons">Pause</button>
+        <button id="end-button" class="buttons">End</button>
+    </div>
+
+    <div id="bottom-row">
+        <div id="info-box">
+            <h2 id="info-header"></h2>
+            <div id="info-div">
+                <img id="wkPic"></img>
+                <p id="info-text"></p>
+            </div>
+            
+        </div>
+
+        <div id="i-div">
+        </div>
+    </div>
+</body>
+
+<script>
+    document.getElementById("button-div2").style.display = 'none'; 
+    document.getElementById("countdown-text").style.display = 'none'; 
+
+    var wkId;
+    var wkData;
+    var wkName;
+    var currentWk = 0;
+
+    fetch("/workout-details?mode=4")
+        .then(response => response.json())
+        .then(data => {
+            wkData = data.data;
+            wkName = data.name;
+            wkId = data.id;
+
+            document.getElementById("workout-title").textContent = data.name;
+            document.getElementById("info-header").textContent = wkData[currentWk].name;
+            document.getElementById("info-text").textContent = wkData[currentWk].info;
+
+            var pic = document.getElementById("wkPic");
+            pic.src = wkData[currentWk].link;
+
+            var newList = document.createElement("ul");
+            newList.setAttribute("id", "itin-list");
+
+            wkData.forEach(workout => {
+
+                var newI = document.createElement("li");
+                newI.textContent = workout.name + " for " + workout.time + " seconds";
+                newI.style.color = "grey";
+                newList.appendChild(newI);
+                
+            });
+
+            document.getElementById("i-div").appendChild(newList);
+
+            var list = document.querySelectorAll("#itin-list li");
+            var newI = list[0];
+            newI.classList.add("selected");
+        })
+
+    function changeInfo (mode) {
+
+        document.getElementById("info-header").textContent = wkData[currentWk].name;
+        document.getElementById("info-text").textContent = wkData[currentWk].info;
+        
+        var pic = document.getElementById("wkPic");
+        pic.src = wkData[currentWk].link;
+
+        var list = document.querySelectorAll("#itin-list li");
+
+        if (mode == true) {
+            var oldLi = list[list.length - 1];
+        } else {
+            var oldLi = list[currentWk-1];
+        }
+        
+        oldLi.classList.remove("selected");
+
+        var newLi = list[currentWk];
+        newLi.classList.add("selected");
+    }
+
+    async function sendDetails(time) {
+        var date = new Date();
+
+        var minutes = date.getMinutes();
+        var hours = date.getHours();
+        var day = date.getDate();
+        var month = date.getMonth() + 1;
+        var year = date.getFullYear();
+
+        var time1 = minutes + ":" + hours + "    " + day + "/" + month + "/" + year;
+        try {
+            const response = await fetch ("/add-recent", {
+                method: "POST",
+                headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+                body: `name=${encodeURIComponent(wkName)}&id=${encodeURIComponent(wkId)}&time=${encodeURIComponent(time)}&date=${encodeURIComponent(time1)}`,
+            })
+        } catch (error) {
+            console.log(error);
+        }
+
+    }
+
+    var currentWk = 0;
+    var timer;
+    var paused = false;
+    var tElapsed = 0;
+
+    function startTimer() {
+        var elem = document.getElementById("countdown-text");
+        elem.style.display = "flex";
+        if (currentWk >= wkData.length) {
+            clearInterval(timer);
+            currentWk = 0;
+            document.getElementById("button-div1").style.display = 'flex';
+            document.getElementById("button-div2").style.display = 'none';
+            elem.style.display = 'none'; 
+            sendDetails(tElapsed)
+            tElapsed = 0;
+
+            return;
+        } else {
+            var timeLeft = wkData[currentWk].time;
+            elem.textContent = timeLeft;
+
+            timer = setInterval(function() {
+                if (paused == false) {
+                    if (timeLeft > 0) {
+                        tElapsed += 1
+                        timeLeft -= 1;
+                        elem.textContent = timeLeft;
+                    } else {
+                        clearInterval(timer);
+
+                        currentWk += 1;
+
+                        if (currentWk < wkData.length) {
+                            changeInfo(false);
+                        }
+
+                        startTimer();
+                    }
+                }
+            }, 1000);
+        }
+    }
+
+    document.getElementById("start-button").addEventListener("click", function(){
+        currentWk = 0;
+        document.getElementById("button-div1").style.display = 'none';
+        document.getElementById("button-div2").style.display = 'flex';
+        startTimer();
+    });
+
+    document.getElementById("pause-button").addEventListener("click", function() {
+        paused = !paused;
+        var button1 = document.getElementById("pause-button");
+
+        if (paused == true) {
+            button1.style.backgroundColor = "lightsalmon";
+            button1.style.border = "2px red solid"
+            button1.textContent = "Paused";
+        } else {
+            button1.style.backgroundColor = "lightcyan";
+            button1.textContent = "Pause";
+            button1.style.border = "2px #42BDF2 solid";
+            
+        }
+    })
+
+    document.getElementById("end-button").addEventListener("click", function() {
+        clearInterval(timer);
+        document.getElementById("countdown-text").style.display = "none";
+        document.getElementById("button-div1").style.display = 'flex';
+        document.getElementById("button-div2").style.display = 'none';
+        currentWk = 0;
+
+        paused = false;
+        var button1 = document.getElementById("pause-button");
+        button1.style.backgroundColor = "lightcyan";
+        button1.textContent = "Pause";
+
+        sendDetails(tElapsed)
+        tElapsed = 0;
+
+        changeInfo(true);
+    })
+
+</script>
+
+<style>
+
+    body {
+        background-color: #fafafa;
+    }
+
+    h1, h2, button {
+        font-family: "Ubuntu";
+    }
+
+    p, li {
+        font-family: "Vollkorn";
+    }
+
+    #top {
+        display: flex;
+        margin-right: 3%;
+        justify-content: space-between;
+    }
+
+    #back-button {
+        background-color: #fafafa;
+        border: none;
+        width: 20vw;
+        font-weight: 700;
+        font-size: 120%;
+    }
+
+
+    #countdown-text {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin-left: auto;
+        margin-right: auto;
+        margin-bottom: 5vw;
+        width: 13vw; 
+        height: 13vw; 
+        text-align: center; 
+        top: 0; bottom: 0;
+        left: 0; right: 0; 
+        padding-right: 2.5vw;
+        font-size: 250%;
+        font-weight: 700;
+        border: 2px solid #42BDF2;
+        border-radius: 50%; 
+        background-color: white;
+    }
+
+    .selected {
+        color: black;
+        border-left: 20px #42BDF2 solid;
+        background-color: lightskyblue;
+        font-size: 130%;
+    }
+
+    #button-div2 {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 10vw;
+        margin-right: 3% auto;
+        margin-bottom: 5vw;
+    }
+
+    #button-div2 button {
+        font-size: 130%;
+        border: 2px #42BDF2 solid;
+        border-radius: 12px;
+        background-color: lightcyan;
+        height: 4vw;
+        width: 20vw;
+    }
+
+    #info-div {
+        display: flex;
+        margin-right: 3%;
+        justify-content: space-evenly;
+    }
+
+    #info-header {
+        text-decoration: underline;
+        padding-top: 0%;
+    }
+
+    #info-text {
+        width: 20vw;
+    }
+
+    li {
+        list-style: none;
+        padding: 1.5vw;
+        background-color: #e1f9fa;
+        text-align: center;
+        width: 17w;
+        font-size: 120%;
+    }
+
+    #i-div {
+        width: 35vw;
+        height: 20vw;
+        margin-top: -1vw;
+    }
+
+    img {
+        display: block;
+        margin: auto;
+        height: 15vw;
+        width: 15vw;
+        margin-left: -1vw;
+    }
+    
+    #start-button {
+        display: block;
+        margin: 5% auto;
+        width: 35vw;
+        height: 10vw;
+        font-size: 200%;
+        background-color: #42BDF2;
+        box-shadow: #5E5DF0 0 10px 20px -10px;
+        box-sizing: border-box;
+        border: 0;
+        border-radius: 30px;
+    }
+
+    h1 {
+        font-size: 200%;
+        padding-left: 3%;
+    }
+
+    #info-box {
+        border: 2px #42BDF2 solid;
+        width: 38vw;
+        height: 20vw;
+        padding-inline: 2vw;
+        background-color: white; 
+    }
+
+    #bottom-row {
+        display: flex;
+        margin: 3% right;
+        justify-content: space-evenly;
+    }
+
+</style>
+

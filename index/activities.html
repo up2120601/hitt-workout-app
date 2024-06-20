@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Workout +</title>
+    <link href='http://fonts.googleapis.com/css?family=Ubuntu:bold' rel='stylesheet' type='text/css'>
+    <link href='http://fonts.googleapis.com/css?family=Vollkorn' rel='stylesheet' type='text/css'>
+</head>
+
+<body>
+    <div class="topnav">
+        <a draggable="false" href="mainpage">Home</a>
+        <a draggable="false" href="recent-workouts">Recent activity</a>
+        <a draggable="false" href="create-workout">Create a<br/>workout</a>
+        <a draggable="false" class="active" href="activities">Activities</a>
+        <a id="lg-nav" draggable="false" href="/">Log out</a>
+    </div>
+
+    <h1 id="title">All the activities our platform offers for you to be in the shape you want</h1>
+    
+    <div id="all"></div>
+
+</body>
+
+<script>
+    fetch("/all-activ")
+        .then(response => response.json())
+        .then(workouts => {
+            
+            var mainDiv = document.getElementById("all");
+            var index = 0;
+
+            workouts.forEach(wk => {
+
+                if (index > 0) {
+
+                    var newD = document.createElement("div");
+                    newD.classList.add("wk-div");
+
+                    var leftDiv = document.createElement("div");
+                    leftDiv.classList.add("inner-1");
+
+                    var newT = document.createElement("h2");
+                    newT.textContent = wk.name;
+                    newT.classList.add("wk-name");
+                    leftDiv.appendChild(newT);
+
+                    var newDes = document.createElement("p");
+                    newDes.textContent = wk.description;
+                    newDes.classList.add("wk-des");
+                    leftDiv.appendChild(newDes);
+
+                    newD.appendChild(leftDiv);
+
+                    var newPic = document.createElement("img");
+                    newPic.src = wk.link;
+                    newPic.classList.add("pics");
+                    newD.appendChild(newPic);
+
+                    newBut = document.createElement("button");
+                    newBut.classList.add("buttons");
+                    newBut.textContent = "Do it"
+                    var newUrl = "/activity-workout?workout=" + index;
+                    newBut.onclick = () => window.location.href = newUrl;
+                    newD.appendChild(newBut);
+
+                    mainDiv.appendChild(newD);
+                }
+
+                index += 1;
+
+            });
+        })
+
+</script>
+
+<style>
+
+    body {
+        background-color: #fafafa;
+    }
+
+    h1, h2 {
+        font-family: "Ubuntu";
+    }
+    
+    button:hover {
+        cursor: pointer;
+    }
+
+    p {
+        margin-top: -1vw;
+        font-family: "Vollkorn";
+    }
+
+    #lg-nav:hover {
+        background-color: rgba(238,32,77, 0.3);
+        border: 1px solid black;
+    }
+
+    .buttons {
+        width: 10vw;
+        height: 10vw;
+        background-color: white;
+        border: 2px solid #42BDF2;
+        font-size: 120%;
+        font-weight: 600;
+    }
+
+    .inner-1 {
+        margin-left: 2vw;
+        width: 40vw;
+
+    }
+
+    .pics {
+        height: 10vw;
+        width: 20vw;
+        margin-left: 3vw;
+        border: 2px solid #42BDF2;
+        border-top: none;
+    }
+
+    .wk-div {
+        overflow:hidden;
+        border: 2px solid #42BDF2;
+        height: 10vw;
+        width: 70vw;
+        margin-left: auto;
+        margin-right: auto;
+        margin-bottom: 3vw;
+        display: flex;
+        background-color: white;
+    }
+
+    #all {
+        margin-top: 3vw;
+    }
+
+    #title {
+        margin-top: 10vw;
+        font-size: 130%;
+        color:#42BDF2;
+        margin-left: 2vw;
+        text-decoration: underline;
+    }
+    .topnav {
+        width: 100vw;
+        height: 1.5vw;
+        position: fixed;
+        top:0;
+    }
+
+    .topnav a {
+        float:left;
+        text-align: center;
+        text-decoration: none;
+        font-size: 110%;
+        font-weight: 600;
+        color: black;
+        padding-top: 2vw;
+        background-color: white;
+        width: 19.5vw;
+        height: 4vw;
+    }
+
+    .topnav a.active {
+        background-color: #72A0C1;
+        color: white;
+    }
+
+    .topnav a:hover {
+        background-color: #B9D9EB;
+    }
+
+
+</style>

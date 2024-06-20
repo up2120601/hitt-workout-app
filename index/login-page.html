@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Workout +</title>
+    <link href='http://fonts.googleapis.com/css?family=Ubuntu:bold' rel='stylesheet' type='text/css'>
+    <link href='http://fonts.googleapis.com/css?family=Vollkorn' rel='stylesheet' type='text/css'>
+</head>
+
+<body>
+    <h1 id="loginheader" class="center">Workout +</h1>
+    <form action="/login" method="post"> 
+        <div class="center" style="display: flex">
+            <label id="logintext">Username: </label>
+            <input type="text" id="username" name="username" class="logininput"><br>
+        </div>
+        <div class="center" style="display: flex">
+            <label id="logintext">Password: </label>
+            <input type="password" id="password" name="password" class="logininput"><br>
+        </div>
+        <button id="loginbutton" class="center" type="submit">Login</button>
+        
+    </form>
+
+    <button id="signupbutton" class="center" type="button" onclick="window.location.href='/signup'">Sign Up</button>
+
+    <h1 id="error-text"></h1>
+
+</body>
+
+<script>
+        
+    document.getElementsByClassName('loginbutton')[0].addEventListener('click', async function(event) {
+        event.preventDefault();
+        
+        const username = document.getElementById('username').value;
+        const password = document.getElementById('password').value;
+
+        document.getElementById("error-text").textContent = "Invalid username or password";
+
+        try {
+            const response = await fetch('/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: `username=${encodeURIComponent(username)}&password=${encodeURIComponent(password)}`,
+            });
+        
+        } catch (error) {
+            console.error('Error during login:', error);
+        }
+
+        document.getElementById("error-text").textContent = "Invalid username or password";
+
+        
+    });
+
+</script>
+
+
+<style type="text/css">
+
+    h1, h2, button {
+        font-family: "Ubuntu";
+    }
+
+    p {
+        font-family: "Vollkorn";
+    }
+    
+    .plus {
+        font-size: 600%;
+    }
+
+    #loginheader {
+        color: #42BDF2;
+        padding-top: 50px;
+        font-size: 400%;
+        padding-bottom: 7%;
+    }
+
+    .center {
+        text-align: center;
+        justify-content: center;
+        display: flex;
+        align-items: center;
+    }
+
+    .logininput {
+        height: 45px;
+        width: 100px;
+        padding: 0; 
+        margin: 20px;
+        border-left: none;
+        border-right: none;
+        border-top: none;
+        border-bottom:0.5px solid black;
+    }
+
+    .logininput:focus {
+        border-bottom: 0.58x solid blue; 
+    }
+
+    #logintext {
+        font-size: 2em;
+        margin: 0; 
+    }
+
+    #loginbutton {
+        display: block;
+        margin: 3% auto;
+        width: 30%;
+        height: 50px;
+        background-color: white;
+    }
+
+    #signupbutton {
+        display: block;
+        margin: auto;
+        margin-top: 1%;
+        width: 30%;
+        height: 50px;
+        background-color: white;
+    }
+</style>

@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Workout +</title>
+    <link href='http://fonts.googleapis.com/css?family=Ubuntu:bold' rel='stylesheet' type='text/css'>
+    <link href='http://fonts.googleapis.com/css?family=Vollkorn' rel='stylesheet' type='text/css'>
+</head>
+
+<body>
+    <div id="show-div-outer">
+        <div id="show-div-inner">
+            <div id="show-top">
+                <h id="show-name">wk 1</h>
+            </div>
+           
+            <div id="show-itin">
+                <h1>Itinerary</h1>
+                <ul id="show-list"></ul>
+            </div>
+            <div id="show-buttons">
+                <button class="show-bs" id="close-button">Close</button>
+                <button class="show-bs" id="do-button">Do it</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="topnav">
+        <a href="mainpage">Home</a>
+        <a class="active" href="recent-workouts">Recent activity</a>
+        <a href="create-workout">Create a<br/>workout</a>
+        <a href="activities">Activities</a>
+        <a id="lg-nav" href="/">Log out</a>
+    </div>
+
+    <h1 id="title">Your recent workouts</h1>
+
+    <div id="workouts-div">
+
+    </div>
+
+
+</body>
+
+<script>
+    document.getElementById("show-div-outer").style.display = "none";
+    var lookingAt = false;
+
+    fetch("/user-recents")
+    .then(response => response.json())
+    .then(recents => {
+
+        var mainDiv = document.getElementById("workouts-div");
+
+
+        recents.forEach(element => {
+            var newDiv = document.createElement("div");
+            newDiv.classList.add("recent-divs");
+
+            var newDiv2 = document.createElement("div");
+            newDiv2.classList.add("text-div");
+
+
+            var newT = document.createElement("p");
+            newT.textContent = (element.name[0].toUpperCase() + element.name.slice(1)) + " for " + element.time + " seconds";
+            newT.classList.add("recent-text")
+            newDiv2.appendChild(newT);
+
+            var dateT = document.createElement("p");
+            dateT.textContent = element.date;
+            dateT.classList.add("recent-date");
+            newDiv2.appendChild(dateT);
+
+            var newT2 = document.createElement("a");
+            newT2.textContent = "View more";
+            newT2.classList.add("vm_text");
+            newT2.setAttribute("clickable", "true")
+            newT2.dataset.value1 = element.toSend;
+            newT2.dataset.value2 = element.time;
+            newDiv2.appendChild(newT2);
+
+            newT2.addEventListener("click", function () {
+                expandMore(this.dataset.value1, this.dataset.value2)
+            })
+
+            newDiv.appendChild(newDiv2);
+
+
+            var newB = document.createElement("button");
+            
+            var url = "/workout-page?mode=1&workout=" + element.toSend;
+            newB.onclick = () => window.location.href = url;
+            newB.textContent = "Do it again"
+            newB.classList.add("recent-button");
+            newDiv.appendChild(newB);
+
+            mainDiv.appendChild(newDiv);
+
+            
+        });
+    })
+
+    async function expandMore(value, time) {
+
+        
+        lookingAt = value;
+        var url = "itin-show?wk=" + value;
+        fetch(url)
+            .then(response => response.json())
+            .then(workouts => {
+                document.getElementById("show-name").textContent = workouts.name + "for "+ time + " seconds ";
+                
+                var list = document.getElementById("show-list");
+            
+                workouts.data.forEach(workout => {
+                    var newL = document.createElement("li");
+                    var newText = workout.name + " for " + workout.time + "seconds";
+                    newL.textContent = newText;
+                    list.appendChild(newL);
+
+                });
+
+            })
+
+        document.getElementById("show-div-outer").style.display = "flex";
+    }
+
+    document.getElementById("close-button").addEventListener("click", function() {
+        document.getElementById("show-div-outer").style.display = "none";
+        lookingAt = false;
+        document.getElementById("show-name").textContent = "";
+        document.getElementById("show-list").innerHTML = "";
+    })
+
+    document.getElementById("do-button").addEventListener("click", function() {
+        var url = "/workout-page?mode=1&workout=" + lookingAt;
+        document.location.href = url;
+    })
+
+</script>
+
+<style>
+
+    body {
+        background-color: #fafafa;
+    }
+
+
+    h1, h2, button {
+        font-family: "Ubuntu";
+    }
+
+    p{
+        font-family: "Vollkorn";
+
+    }
+
+    #lg-nav:hover {
+        background-color: rgba(238,32,77, 0.3);
+        border: 1px solid black;
+    }
+
+    #title {
+        text-align: center;
+        margin-top: 10vw;
+        margin-bottom: 4vw;
+        text-decoration: underline;
+        color:#42BDF2;
+    }
+
+    .topnav {
+        width: 100vw;
+        height: 1.5vw;
+        position: fixed;
+        top:0;
+    }
+
+    .topnav a {
+        float:left;
+        text-align: center;
+        text-decoration: none;
+        font-size: 110%;
+        font-weight: 600;
+        color: black;
+        padding-top: 2vw;
+        background-color: white;
+        width: 19.5vw;
+        height: 4vw;
+    }
+
+    .topnav a.active {
+        background-color: #72A0C1;
+        color: white;
+    }
+
+    .topnav a:hover {
+        background-color: #B9D9EB;
+    }
+
+    #show-top {
+        margin-left: auto;
+        margin-right: auto;
+        justify-content: center;
+        text-align: center;
+        width: 40vw;
+        margin-bottom: 2vw;
+    }
+
+    li {
+        margin-bottom: 1vw;
+        font-size: 105%;
+        list-style-type: square;
+    }
+
+
+    #show-name {
+        padding-top: 4vw;
+        font-size: 150%;
+        font-weight: 600;
+    }
+
+    #show-itin h1 {
+        font-size: 130%;
+        text-decoration: underline;
+    }
+
+    #show-itin {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 10%;
+    }
+
+    #show-buttons {
+        display: flex;
+        margin: 3% right;
+        justify-content: center;
+        gap: 5%;
+        
+
+    }
+
+    .show-bs {
+        height: 3vw;
+        width: 15vw;
+        background-color: white;
+        border: 2px solid #42BDF2;
+        border-radius: 12px;
+    }
+
+    #show-div-outer {
+        position: fixed; 
+        z-index: 1; 
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%; 
+        overflow: auto; 
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background-color: rgba(0, 0, 0, 0.3);
+    }
+
+    #show-div-inner {
+        padding: 2%;
+        height: 30vw;
+        width: 40vw;
+        background-color: white;
+        border: 5px solid #42BDF2;
+        border-radius: 20px;
+    }
+
+    .vm_text {
+        color: blue;
+        position: relative;
+        top: -1vw;
+        font-size: 110%;
+    }
+
+    .vm_text:hover {
+        cursor: pointer;
+    }
+
+    .recent-text {
+        margin: 3vw;
+        margin-top:2vw;
+        margin-bottom: 0.4vw;
+        font-size: 140%;
+
+    }
+
+    .recent-date {
+        font-size: 120%;
+        margin-bottom: 2vw;
+    }
+
+    .text-div {
+        text-align: center;
+        margin-left: 8vw;
+    }
+
+    .recent-divs {
+        width: 50vw;
+        height: 10vw;
+        display: flex;
+        border: 2px solid #42BDF2;
+        border-radius: 20px;
+        margin-bottom: 4vw;
+        margin-left: auto;
+        margin-right: auto;
+        justify-content: space-between;
+        overflow: hidden;
+        background-color: white;
+    }
+
+    .recent-button {
+        width: 15vw;
+        height: 10vw;
+        margin-right: 0;
+        background-color: white;
+        font-size: 130%;
+        border: none;
+        border-left: 2px solid #42BDF2;
+    }
+
+    .recent-button:hover {
+        cursor: pointer;
+    }
+
+    h2 {
+        font-size: 160%;
+    }
+
+</style>

@@ -1,0 +1,615 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Workout +</title>
+    <link href='http://fonts.googleapis.com/css?family=Ubuntu:bold' rel='stylesheet' type='text/css'>
+    <link href='http://fonts.googleapis.com/css?family=Vollkorn' rel='stylesheet' type='text/css'>
+</head>
+
+<body>
+
+    <div id="import-outer-div">
+        <div id="import-inner-div">
+            <div id="import-upper-div">
+
+                <div id="import-select-div">
+                    <h class="title">Select a workout to import</h>
+                    <select id="import-select"></select>
+                </div>
+
+                <div id="import-show">
+                    <h style="color: black" class="title" id="import-title"></h>
+                    <ul id="import-list"></ul>
+                </div>
+
+            </div>
+
+            <div id="import-lower-div">
+                <button id="close-button">Close</button>
+                <button id="import-button-save">Import</button>
+            </div>
+
+            
+        </div>
+    </div>
+    
+    <div class="topnav">
+        <a draggable="false" onclick="navClicked(0)">Home</a>
+        <a draggable="false" onclick="navClicked(1)">Recent activity</a>
+        <a draggable="false" class="active" >Create a<br/>workout</a>
+        <a draggable="false" onclick="navClicked(2)">Activities</a>
+        <a draggable="false" onclick="navClicked(3)" id="lg-nav">Log out</a>
+    </div>
+
+    <h1 id="top-bar">Create a workout</h1>
+
+    <div id="main-row">
+        <div id="option-select">
+            <h class="title">Select a workout</h>
+
+            <div id="workout-detail">
+                <div id="info-box">
+                    <p id="info-title" style="text-decoration: underline;"></p>
+                    <p id="info-description"></p>
+                </div>
+                <img id="info-pic"></img>
+            </div>
+ 
+            <div id="dropdown-div">
+                <select id="drop-down"></select>
+                <select id="time-drop">
+                    <option id="bold-text" value="0" selected disabled>Time</option>
+                    <option value="20">20 seconds</option>
+                    <option value="40">40 seconds</option>
+                    <option value="60">60 seconds</option>
+                    <option value="90">90 seconds</option>
+                    <option value="120">120 seconds</option>
+                    
+                </select>
+            </div>
+            
+            <button id="add-button">Add</button>
+
+        </div>
+
+        <div id="current-option-div">
+            <h style="top:0" class="title">Your selections </h>
+            <ul id="picked-list"></ul>
+
+            <div id="name-div">
+                <span id="place">Workout name: </span>
+                <input type="text" id="name-input">
+            </div>
+
+            <div id="button-div">
+                <button id="save-button">Save</button>
+                <button id="import-button">Import your workout</button>
+            </div>
+        </div>
+    </div>
+
+</body>
+
+<script>
+
+    document.getElementById("import-outer-div").style.display = "none";
+
+    var touched = false;
+
+    var itemValues = {};
+
+    fetch("/workout-details?mode=2")
+        .then(response => response.json())
+        .then(workouts => {
+
+            var newSelect = document.getElementById("drop-down");
+
+            var newO = document.createElement("option");
+            newO.selected = true;
+            newO.disabled = true;
+            newO.textContent = "Workouts";
+            newO.value = null;
+            newSelect.appendChild(newO);
+
+            workouts.forEach(workout => {
+                var newO = document.createElement("option");
+    
+                newO.setAttribute("value", workout.index);
+                newO.textContent = workout.name;
+
+                newSelect.appendChild(newO);
+            });
+
+            document.getElementById("add-button").addEventListener("click", function() {
+                var dd = document.getElementById("drop-down");
+                var v1 = dd.options[dd.selectedIndex].value;
+                var name = dd.options[dd.selectedIndex].textContent; 
+                var time = document.getElementById("time-drop").value;
+
+                if (v1 != null && time != "0") {
+                    touched = true;
+                    var list = document.getElementById("picked-list");
+
+                    var newE = document.createElement("li");
+                    newE.textContent = name + " for " + time + " seconds";
+
+                    var v2 = v1 + "/" + time;
+                    newE.setAttribute("data-value", v2);
+                    newE.setAttribute("draggable", "true");
+                    newE.setAttribute("ondragover", "dragOver(event)");
+                    newE.setAttribute("ondragstart", "dragStart(event)");
+
+
+                    list.appendChild(newE);
+
+                    var value = v2;
+                    
+                    index = Object.keys(itemValues).length;
+                    itemValues[index] = { index, value };
+
+
+
+                }
+            });
+
+            document.getElementById("drop-down").addEventListener("change", function() {
+   
+
+                fetch(`/workout-details?mode=1&workout=${document.getElementById("drop-down").value}`)
+                .then(response => response.json())
+                .then(details => {
+                    document.getElementById("info-title").textContent = details.name;
+                    document.getElementById("info-description").textContent = details.description;
+                    document.getElementById("info-pic").setAttribute("src", details.piclink);
+
+                })
+            })
+
+            document.getElementById("save-button").addEventListener("click", async function(){
+
+                var name = document.getElementById("name-input").value;
+                var length1 = Object.keys(itemValues).length;
+
+  
+                if (name.length > 4 && length1 > 1) {
+
+                    try {
+                        console.log(1)
+                        await fetch("/set-workout", {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/x-www-form-urlencoded',
+                            },
+                            body: `name=${encodeURIComponent(name)}&data=${encodeURIComponent(JSON.stringify(itemValues))}`
+                        })
+                            .then(response => response.text())
+                            .then(data => {
+
+                                if (data == "true") {
+                                    console.log(2)
+                                    window.location.href = "/mainpage";
+                                } else {
+                                    console.log(3)
+                                    if (confirm("You already have a workout with the same name, would you like to change it?")) {
+                                        sendWk(name);
+                                        window.location.href = "/mainpage";
+                                    }
+                                }
+                            })
+
+                    } catch (err) {
+                        console.log(err)
+                    }
+                }
+            })
+        })
+
+    async function sendWk(name) {
+        const response = await fetch("/set-workout", {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: `name=${encodeURIComponent(name)}&data=${encodeURIComponent(JSON.stringify(itemValues))}`
+        })
+    }
+
+    fetch("/user-workouts")
+        .then(response => response.json())
+        .then(workouts => {
+            var select = document.getElementById("import-select");
+
+            var newA = document.createElement("option");
+            newA.textContent = "Select an option";
+            newA.style.userSelect = "disabled";
+            newA.value = "na";
+            select.appendChild(newA);
+
+            workouts.forEach(wk => {
+                var newO = document.createElement("option");
+                newO.textContent = wk.name;
+
+                newO.value = wk.id;
+                select.appendChild(newO);
+            })
+
+        })
+
+    document.getElementById("import-button").addEventListener("click", function() {
+        document.getElementById("import-outer-div").style.display = "flex";
+    })
+
+    document.getElementById("import-select").addEventListener("change", function() {
+        var selected = this.options[this.options.selectedIndex];
+
+        if (selected.value != "na") {
+        
+            document.getElementById("import-title").textContent = selected.textContent;
+            var url = "/import-wk-show?workout=" + selected.value;
+
+            console.log(selected.value);
+
+            fetch(url)
+                .then(response => response.json())
+                .then(names => {
+                    var select = document.getElementById("import-list");
+                    select.innerHTML = "";
+
+                    names.forEach(item => {
+                        var newO = document.createElement("li");
+                        newO.textContent = (item[0].toUpperCase() + item.slice(1));
+                        newO.classList.add("import-li");
+                        select.appendChild(newO);
+                    })
+                })
+            }
+    })
+
+    document.getElementById("close-button").addEventListener("click", function () {
+        document.getElementById("import-outer-div").style.display = "none";
+    })
+
+    document.getElementById("import-button-save").addEventListener("click", function() {
+        var selectedI = document.getElementById("import-select").options.selectedIndex;
+        var selected = document.getElementById("import-select").options[selectedI];
+
+        if (selected.value != "na") {
+            touched = true;
+            var url = "import-workout?workout=" + selected.value;
+            fetch(url)
+                .then(response => response.json())
+                .then(allData => {
+                    document.getElementById("name-input").textContent = allData.name;
+                    document.getElementById("import-outer-div").style.display = "none";
+
+                    var list = document.getElementById("picked-list");
+
+                    var raw = allData.raw;
+                    console.log(raw);
+                    raw = raw.split("!");
+                    raw.shift();
+                    index2 = 0
+
+                    allData.data.forEach(item => {
+                        var newE = document.createElement("li");
+                        newE.textContent = item.name + " for " + item.time + " seconds";
+
+                        var rawV = raw[index2];
+                        newE.setAttribute("data-value", rawV);
+                        newE.setAttribute("draggable", "true");
+                        newE.setAttribute("ondragover", "dragOver(event)");
+                        newE.setAttribute("ondragstart", "dragStart(event)");
+
+                        list.appendChild(newE);
+                        index = Object.keys(itemValues).length;
+
+                        console.log(index, rawV);
+                        itemValues[index] = { index, rawV };
+
+                        index2 += 1
+                    })
+                })
+        }
+
+    })
+
+    function navClicked(value) {
+        var locations = ["mainpage", "recent-workouts", "activities", "/"];
+
+        if (touched == true) {
+            var text;
+            if (confirm("Are you sure you want to delete your unsaved workout?")) {
+                window.location.href = locations[value];
+            }
+        } else {
+            window.location.href = locations[value];
+        }
+    }
+
+    // --- Drag and drop feature ---
+
+    var _el;
+
+    function dragOver(e) {
+        if (isBefore(_el, e.target)) {
+            e.target.parentNode.insertBefore(_el, e.target);
+        } else {
+            e.target.parentNode.insertBefore(_el, e.target.nextSibling);
+        }
+
+        updateItemValues();
+    }
+
+    function dragStart(e) {
+        e.dataTransfer.effectAllowed = "move";
+        e.dataTransfer.setData("text/plain", null);
+        _el = e.target;
+
+        updateItemValues();
+    }
+
+    
+    function isBefore(el1, el2) {
+        if (el2.parentNode === el1.parentNode)
+            for (var cur = el1.previousSibling; cur && cur.nodeType !== 9; cur = cur.previousSibling)
+                if (cur === el2)
+                    return true;
+        return false;
+    }
+
+    function updateItemValues() {
+        const listItems = Array.from(_el.parentNode.children);
+        listItems.forEach((item, index) => {
+            var value = item.getAttribute("data-value"); 
+            itemValues[index] = { index, value };
+        });
+
+    }
+
+
+</script>
+
+
+<style type="text/css">
+
+    body {
+        background-color: #fafafa;
+    }
+
+    h1, h2, select, .title {
+        font-family: "Ubuntu";
+    }
+
+    p, button, option, #place {
+        font-family: "Vollkorn";
+    }
+
+    button:hover {
+        cursor: pointer;
+    }
+
+    #lg-nav:hover {
+        background-color: rgba(238,32,77, 0.3);
+        border: 1px solid black;
+    }
+
+    #import-select {
+        height: 2vw;
+        border: 2px solid #42BDF2;
+    }
+
+    #import-show {
+        margin-left: 4vw;
+    }
+
+    #import-li {
+        width: 15vw;
+        list-style-type: circle;
+        color: blue;
+
+    }
+
+    #import-lower-div {
+        display: flex;
+        margin-top: 8vw;
+    }
+
+    #import-lower-div button {
+        width: 20vw;
+    } 
+
+    #import-select-div {
+        display: flex;
+        flex-direction: column;
+    }
+
+    #import-upper-div {
+        display: flex;
+
+    }
+
+    #import-outer-div {
+        position: fixed; 
+        z-index: 1; 
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%; 
+        overflow: auto; 
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background-color: rgba(0, 0, 0, 0.3);
+    }
+
+    #import-inner-div {
+        padding: 2%;
+        height: 25vw;
+        width: 40vw;
+        background-color: white;
+        border: 5px solid #42BDF2;
+        border-radius: 20px;
+    }
+
+    #button-div {
+        display: flex;
+        flex-direction:column;
+
+    }
+
+    #import-drop {
+        width: 20vw;
+        height: 2vw;
+    }
+
+    
+    .topnav {
+        width: 100vw;
+        height: 1.5vw;
+        position: fixed;
+        top:0;
+    }
+
+    .topnav a {
+        float:left;
+        text-align: center;
+        text-decoration: none;
+        font-size: 110%;
+        font-weight: 600;
+        color: black;
+        padding-top: 2vw;
+        background-color: white;
+        width: 19.5vw;
+        height: 4vw;
+    }
+
+    .topnav a.active {
+        background-color: #72A0C1;
+        color: white;
+    }
+
+    .topnav a:hover {
+        background-color: #B9D9EB;
+    }
+
+    #place {
+        font-size: 120%;
+
+    }
+
+    #name-input {
+        border-left: none;
+        border-right: none;
+        border-top: none;
+        border-bottom:0.5px solid black;
+
+        margin-top: 2vw;
+        margin-bottom: 2vw;
+        background-color: #fafafa;
+    }
+
+    .logininput:focus {
+        border-bottom: 0.58x solid blue; 
+    }
+    
+    
+    #save-button {
+        width: 30vw;
+        height: 3vw;
+    }
+
+    ul {
+
+        list-style: none;
+        margin-top: 2.5vw;
+        padding: 0;
+
+
+    }
+
+    #picked-list li {
+        border: 2px solid black;
+        background-color: lightskyblue;
+        padding: 2%;
+        padding-bottom: 5%;
+        width: 25vw;
+        height: 1vw;
+        font-size: 120%;
+        text-align: center;
+    }
+
+    #info-box {
+        border: 2px solid black;
+        width: 15vw;
+        height: 20vw;
+        text-align: center;
+        background-color: white;
+    }
+
+    #info-description {
+        padding-inline: 1vw;
+    }
+
+    #info-pic {
+        width: 15vw;
+        height: 20vw;
+        border: 2px solid black;
+        border-left: none;
+        background-color: white;
+    }
+
+    #workout-detail {
+        display: flex;
+
+    }
+
+    button {
+        margin-top: 4%;
+        height: 3vw;
+        width: 30vw;
+        font-size: 120%;
+        font-weight: 500;
+        background-color: white;
+        border: 2px solid #42BDF2;
+
+    }
+
+    #time-drop {
+        width: 10vw;
+        height: 2vw;
+        margin-top: 5%;
+        text-align: center;
+    }
+
+    #drop-down {
+        width: 20vw;
+        height: 2vw;
+        margin-top: 5%;
+        text-align: center;
+    }
+
+    #main-row {
+        margin-top: 5%;
+        display: flex;
+        justify-content: space-evenly;
+        align-items: center;
+    }
+
+    #option-select {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .title {
+        color: #42BDF2;
+        margin-left: auto;
+        margin-right: auto;
+        font-size: 150%;
+        margin-bottom: 15%;
+        text-decoration: underline;
+    }
+
+
+</style>

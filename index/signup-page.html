@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Workout +</title>
+    <link href='http://fonts.googleapis.com/css?family=Ubuntu:bold' rel='stylesheet' type='text/css'>
+    <link href='http://fonts.googleapis.com/css?family=Vollkorn' rel='stylesheet' type='text/css'>
+</head>
+
+<body>
+    <div id="top">
+        <button id="back-button"  onclick="window.location.href='/'">&larr;</button>
+        <h1>Sign up to Workout +</h1>
+    </div>
+   
+
+    <form>
+        <div class="input-row">
+
+            <div class="input-div">
+                <input type="text" id="firstn-input">
+                <span class="place">First name</span>
+            </div>
+
+            <div class="input-div">
+                <input type="text" id="lastn-input">
+                <span class="place">Last name</span>
+            </div>
+        </div>
+
+        <div class="input-div">
+            <input type="text" id="username-input">
+            <span class="place">Username</span>
+        </div>
+
+        <div class="input-div">
+            <input type="text" id="password-input">
+            <span class="place">Password</span>
+        </div>
+        
+    </form>
+
+    <button id="signup-button" class="center" type="submit">Sign up</button>
+    <h1 id="error"></h1>
+
+</body>
+
+<script>
+    document.getElementById("signup-button").addEventListener("click", async function () {
+        var fName = document.getElementById("firstn-input").value;
+        var lName = document.getElementById("lastn-input").value;
+        var username = document.getElementById("username-input").value;
+        var password = document.getElementById("password-input").value;
+
+        var errMessage = false;
+
+        if (fName.length < 2 || lName.length < 2) {
+            errMessage = "First and last names have to be longer than three charecters";
+
+        } else if (username.length < 3 || password.length < 3) {
+            errMessage = "Username and password needs to be longer than 3 charecters";
+        } 
+
+        if (errMessage == false) {
+            try {
+                const respone = await fetch("/create-account", {
+                    method: "POST",
+                    headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+                    body: `username=${encodeURIComponent(username)}&password=${encodeURIComponent(password)}&fname=${encodeURIComponent(fName)}&lname=${encodeURIComponent(lName)}`
+                })
+            } catch (error) {
+                console.log(error);
+            }
+
+            window.location.href = "/";
+
+        } else {
+            document.getElementById("error").textContent = errMessage;
+
+        }
+        
+    })
+
+</script>
+
+
+<style type="text/css">
+
+    #error {
+        font-size: 120%;
+        color: red;
+        margin-top: 3vw;
+        margin-left: -1vw;
+    }
+
+    #top {
+        display: flex;
+        flex-direction: row;
+    }
+
+    span {
+        font-family: "Vollkorn";
+    }
+
+    #back-button {
+        display: block;
+        margin: 3vw;
+        width: 4vw;
+        height: 4vw;
+        background-color: white;
+        border: none;
+        font-size: 140%;
+        border: 2px black solid;
+    }
+
+    #signup-button {
+        display: block;
+        margin: auto;
+        width: 35vw;
+        height: 3.5vw;
+        background-color: white;
+        border: 2px solid #42BDF2;
+        border-radius: 12px;
+        font-size: 140%;
+        font-family: "Ubuntu";
+    }
+
+    h1 {
+        font-family: "Ubuntu";
+        color: #42BDF2;
+        font-size: 300%;
+        padding-bottom: 7%;
+        text-align: center;
+        margin-left: 23vw;
+    }
+
+    .input-div{
+        margin: auto;
+        width: 300px;
+        height: 50px;
+        position: relative;
+        margin-bottom: 3%;
+    }
+
+    .input-row .input-div:first-child {
+        margin-right: 3%;
+    }
+
+    input {
+        width: 20vw;
+        height: 1vw;
+        display: block;
+        margin-bottom: 10px;
+        padding: 5%;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+    }
+
+    .input-row {
+        margin: auto;
+        display: flex;
+        width: 80vw;
+    }
+
+    input:focus {
+        outline-color: #42BDF2;
+        border-color: #42BDF2;
+    }
+
+    .place{
+        position: absolute;
+        transition: 0.2s ease;
+        top: 14px;
+        left: 6px;
+        border-radius: 3px;
+        padding: 2px;
+    }
+
+    input:focus + .place{
+        top: -10px;
+        background: white;
+        font-size: 14px;
+    }
+
+</style>

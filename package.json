@@ -1,0 +1,17 @@
+{
+  "name": "up2120601",
+  "version": "1.0.0",
+  "description": "HITT workout website",
+  "main": "server.js",
+  "scripts": {
+    "setup": "npm install express@4.18.3 sqlite3@5.1.7",
+    "start": "node server.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.18.3",
+    "sqlite3": "^5.1.7"
+  }
+}

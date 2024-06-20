@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Workout +</title>
+    <link href='http://fonts.googleapis.com/css?family=Ubuntu:bold' rel='stylesheet' type='text/css'>
+    <link href='http://fonts.googleapis.com/css?family=Vollkorn' rel='stylesheet' type='text/css'>
+</head>
+
+<body>
+    <div id="top">
+        <h1 id="workout-title" class="underline"></h1>
+        <button id="back-button" onclick="window.location.href='/activities'">&larr; Back</button>
+
+    </div>
+    
+    <div id="before-start">
+
+        <button id="start-button" >Start your workout</button>
+
+        <div id="options-div" class="center">
+
+            <select id="time-option" style="font-weight: bold;">
+                <option id="bold-text"value="0" selected disabled>Time</option>
+                <option value="20">20 seconds</option>
+                <option value="40">40 seconds</option>
+                <option value="60">1 minute</option>
+                <option value="90">1.5 minutes</option> 
+                <option value="180">2 minutes</option>
+            </select>
+
+            <select id="set-num" style="font-weight: bold;">
+                <option id="bold-text" value="0" selected disabled>Sets</option>
+                <option value="1">1 set</option>
+                <option value="2">2 sets</option>
+                <option value="3">3 sets</option>
+            </select>
+
+            <select id="rest" style="font-weight: bold;">
+                <option id="bold-text" value="0" selected disabled>Rest time</option>
+                <option value="30">30 seconds</option>
+                <option value="60">1 minute</option>
+                <option value="120">2 minutes</option>
+            </select>
+
+        </div>
+    </div>
+
+    <div id="workout-div" class="center">
+
+
+        <div id="stat-border">
+            <div id="workout-stats">
+                <div id="time-div" class="center">
+                    <h1 style="text-decoration: underline">TIME</h1>
+                    <h2 id="t-left"></h2>
+                </div>
+
+                <div id="set-div" class="center">
+                    <h1 style="text-decoration: underline">SET</h1>
+                    <h2 id="s-left"></h2>
+                </div>
+            </div>
+
+            <div id="cooldown-div" class="center">
+                <h1 style="text-decoration: underline">COOLDOWN</h1>
+                <h2 id="cooldown-text"></h2>
+            </div>
+        </div>
+
+
+       
+    
+        <div id="workout-buttons">
+
+            <button id="pause-button">Pause</button>
+            <button id="end-button">End</button>
+
+        </div>
+    </div>
+
+    
+
+    <div id="workout-div2">
+
+        <div id="info">
+            <p id="workout-name" class="underline"></p>
+            <p id="info-text"></p>
+        </div>
+
+        <div id="pic-div"></div>
+    </div>
+
+</body>
+
+
+
+<style type="text/css">
+
+    body {
+        background-color: #fafafa;
+    }
+
+    h1, h2, select, button {
+        font-family: "Ubuntu";
+    }
+
+    p, option {
+        font-family: "Vollkorn";
+    }
+
+    #s-left, #t-left {
+        font-size: 200%;
+        color: #002D62;
+    }
+
+    #stat-border {
+        margin-left: auto;
+        margin-right: auto;
+        border: 1px solid #42BDF2;
+        width: 50vw;
+        background-color: white;
+    }
+
+    #workout-stats {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 20vw;
+    }
+
+    #cooldown-div, #set-div, #time-div {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+
+    }
+
+    .picture {
+        width: 30vw;
+        height: 20vw;
+        border: 1px solid lightblue;
+    }
+
+    #cooldown-text {
+        font-size: 250%;
+
+        margin-bottom: 4vw;
+        text-align: center;
+
+    }
+
+    #workout-pic {
+        display: flex; 
+        margin-top: 10px;
+    }
+
+    #workout-div2 {
+        margin-top: 4%;
+        display: flex;
+        justify-content: space-evenly;
+        align-items: center;
+    }
+
+    #workout-buttons button {
+        border: 3px solid #42BDF2;
+        border-radius: 5px;
+        background-color: white;
+        width: 18vw;
+        height: 4vw;
+        margin-top: 6vw;
+        font-size: 140%;
+    }
+
+    #workout-buttons button:hover {
+        background-color: #F28C28;
+        border: 4px solid black;
+    }
+
+    #workout-div {
+        text-align: center;
+    }
+
+    #workout-buttons {
+        display: flex;
+        
+        justify-content: center;
+        align-items: center;
+
+        gap: 10vw;
+    }
+
+    #back-button {
+        background-color: #fafafa;
+        border: none;
+        width: 20vw;
+        font-weight: 700;
+        font-size: 120%;
+    }
+
+    #top {
+        display: flex;
+        margin-right: 3%;
+        justify-content: space-between;
+    }
+
+    .underline {
+        text-decoration: underline;
+    }
+
+    #bold-text {
+        font-weight: 800;
+    }
+
+    #info {
+        background-color: white;
+        border: 2px solid #42BDF2;
+        width: 40vw;
+        text-align: center;
+    }
+
+    #start-button {
+        display: block;
+        margin: 5% auto;
+        width: 35vw;
+        height: 10vw;
+        font-size: 200%;
+        background-color: #42BDF2;
+        box-shadow: #5E5DF0 0 10px 20px -10px;
+        box-sizing: border-box;
+        border: 0;
+        border-radius: 30px;
+
+    }
+
+    select {
+        width: 14vw;
+        height: 2.5vw;
+
+    }
+
+
+    h1 {
+        font-size: 200%;
+        padding-left: 3%;
+    }
+
+    #option-div {
+        margin-right: 3%;
+        width: 50vw;
+    }
+
+    #options-div select {
+        padding: 0 30px;
+        margin-right: 5vw; 
+    }
+
+    #options-div select:last-child {
+        margin-right: 0; 
+    }
+
+    .center {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        text-align: center;
+        justify-content: center;
+    }
+        
+</style>
+
+
+<script>
+    
+
+    fetch("/activity-get")
+        .then(response => response.json())
+        .then(details => {
+            document.getElementById("workout-title").textContent = details.name;
+            document.getElementById("workout-name").textContent = details.name;
+            document.getElementById("info-text").textContent = details.description;
+
+            var picDiv = document.getElementById("pic-div");
+            var newImage = document.createElement('img');
+            newImage.src = details.link;
+            newImage.classList.add("picture");
+            picDiv.appendChild(newImage);
+        })
+
+    var paused = false;
+    var tElapsed = 0;
+    var timer;
+    var onSet = 1;
+    var totalSets;
+    var timeLeft;
+    var totalTime;
+
+    document.getElementById("cooldown-div").style.display = 'none';
+    document.getElementById("workout-div").style.display = 'none';
+
+    document.getElementById("rest").disabled = true;
+    document.getElementById("set-num").addEventListener("change", function() {
+
+        if (document.getElementById("set-num").value > 1) {
+            document.getElementById("rest").disabled = false;
+        } else {
+            document.getElementById("rest").disabled = true;
+            document.getElementById("rest").value= 0;
+        }
+    });
+
+    document.getElementById("start-button").addEventListener("click", function() {
+
+        var time = document.getElementById("time-option").value;
+        var sets = document.getElementById("set-num").value;
+        var cooldown =  document.getElementById("rest").value;
+
+        var answered = false;
+        
+        if (time != 0 && sets != 0) {
+            if (sets > 1) {
+                if (cooldown != 0) {
+                    answered = true;
+                }
+            } else {
+                answered = true;
+            }
+        }
+
+        if (answered == true) {
+
+        
+            totalSets = sets;
+            
+            addWorkout(time, cooldown);
+            
+        }
+    });
+
+    document.getElementById("pause-button").addEventListener("click", function() {
+        paused = !paused;
+
+        var button = document.getElementById("pause-button");
+
+        if (paused == true) {
+            button.style.border = "2px solid red"
+            button.textContent = "Paused";
+        } else {
+            button.style.border = "2px solid #42BDF2"
+            button.textContent = "Pause";
+
+        }
+    });
+
+    document.getElementById("end-button").addEventListener("click", function(){
+        onSet = 1
+        mainDiv.style.display = "none";
+        document.getElementById("cooldown-div").style.display = 'none';
+        document.getElementById("workout-div").style.display = "none";
+        document.getElementById("workout-stats").style.display = "flex";
+        document.getElementById("before-start").style.display = "block";        
+        document.getElementById("cooldown-text").textContent = "";
+        paused = false;
+        
+        if (onCooldown == false) {
+            clearInterval(timer);
+        } else {
+            clearInterval(cTimer);
+        }
+    })
+
+    var cTimer;
+    var timer;
+    var onCooldown = false;
+
+
+    function addWorkout(time, cooldown) {
+
+        totalTime = time 
+        timeLeft = totalTime 
+
+        document.getElementById("before-start").style.display = "none";
+
+        mainDiv = document.getElementById("workout-div");
+        mainDiv.style.display = 'block';
+
+        var tRight = document.getElementById("s-left");
+        tRight.textContent = onSet + "/" + totalSets;
+
+        var tLeft = document.getElementById("t-left");
+        tLeft.textContent = timeLeft + "/" + totalTime;
+
+        timer = setInterval(function() {
+
+            if (paused == false) {
+
+
+                if (timeLeft == 0) {
+                    clearInterval(timer);
+                    onCooldown = true;
+                    setCooldown(time, cooldown);
+
+                } else {
+                    tElapsed += 1;
+                    timeLeft -= 1;
+                    tLeft.textContent = timeLeft + "/" + totalTime;
+                }
+            
+            }
+            
+        }, 1000);
+
+    }
+
+    function setCooldown(time, cooldown) {
+
+        if (totalSets > onSet) {
+            onSet += 1;
+            var cTime = cooldown;
+
+            
+            document.getElementById("cooldown-div").style.display = 'flex';
+            document.getElementById("workout-stats").style.display = "none";
+
+            var textElem = document.getElementById("cooldown-text");
+
+            cTimer = setInterval(function() {
+                if (paused == false) {
+                    if (cTime > 0) {
+                        textElem.textContent = cTime;
+                        cTime -= 1
+
+                    } else {
+                        textElem.textContent = "";
+                        clearInterval(cTimer);
+                        onCooldown = false;
+                        addWorkout(time, cooldown);
+                        document.getElementById("workout-stats").style.display = "flex";
+                        document.getElementById("cooldown-div").style.display = 'none';
+                    }
+                }
+            }, 1000)
+
+        } else {
+            onCooldown = false;
+            onSet = 1;
+            mainDiv.style.display = "none";
+            document.getElementById("cooldown-div").style.display = 'none';
+            document.getElementById("before-start").style.display = "block";
+        }
+    }
+
+    async function sendDetails() {
+        var time = tElapsed;
+        var date = new Date();
+
+        var minutes = date.getMinutes();
+        var hours = date.getHours();
+        var day = date.getDate();
+        var month = date.getMonth() + 1;
+        var year = date.getFullYear();
+
+        var time1 = minutes + ":" + hours + "    " + day + "/" + month + "/" + year;
+        try {
+            const response = await fetch ("/add-recent", {
+                method: "POST",
+                headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+                body: `name=${encodeURIComponent(wkName)}&id=null&time=${encodeURIComponent(time)}&date=${encodeURIComponent(time1)}`,
+            })
+        } catch (error) {
+            console.log(error);
+        }
+
+    }
+
+ 
+</script>
